@@ -224,7 +224,7 @@ async def on_raw_message_edit(payload: disnake.RawMessageUpdateEvent):
 
 # message delete caching
 class DeletedMessageCache:
-    def __init__(self, capacity=10):
+    def __init__(self, capacity=50):
         self.server_queues = {}
         self.capacity = capacity
 
@@ -370,6 +370,29 @@ async def leaderboard(inter, is_ephemeral: bool = commands.Param(default=True, d
 
     await inter.response.send_message(leaderboard_message, ephemeral=is_ephemeral)
 
+class PageEmbed(disnake.ui.View):
+    def __init__(self, embeds):
+        super().__init__(timeout=None)
+        self.embeds = embeds
+        self.current_page = 0
+        self.max_pages = len(embeds)
+
+    @disnake.ui.button(label="Previous", style=disnake.ButtonStyle.primary)
+    async def previous_page(self, button: disnake.ui.Button, interaction: disnake.Interaction):
+        if self.current_page > 0:
+            self.current_page -= 1
+            await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
+        else:
+            await interaction.response.defer()  # No page change
+
+    @disnake.ui.button(label="Next", style=disnake.ButtonStyle.primary)
+    async def next_page(self, button: disnake.ui.Button, interaction: disnake.Interaction):
+        if self.current_page < self.max_pages - 1:
+            self.current_page += 1
+            await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
+        else:
+            await interaction.response.defer()  # No page change
+
 # Slash command to view the message cache
 @bot.slash_command(description="View the deleted message cache for this server.")
 async def get_message_cache(inter, is_ephemeral: bool = commands.Param(default=True, description="Make the response private")):
@@ -385,15 +408,17 @@ async def get_message_cache(inter, is_ephemeral: bool = commands.Param(default=T
     
     # queue empty
     deleted_messages = moderator_queue.get_messages(inter.guild.id)
+    deleted_messages.reverse()
     if not deleted_messages:
         await inter.response.send_message("The message cache is empty. The bot has likely been reset recently.", ephemeral=True)
         return
     
     # body
-    await inter.response.defer(ephemeral=is_ephemeral)
+    embeds = []
+    index = 1
     
     for msg in deleted_messages:
-        embed = disnake.Embed(title="Deleted Message (mrrp mrrow)", color=disnake.Color.red())
+        embed = disnake.Embed(title="Deleted Message ({index}/{len(deleted_messages)})", color=disnake.Color.red())
         embed.add_field(name="Time", value=f"<t:{int(msg.created_at.timestamp())}:f>", inline=True)
         embed.add_field(name="Author", value=f"<@{msg.author.id}>", inline=True)
         embed.add_field(name="Channel", value=f"<#{msg.channel.id}>", inline=True)
@@ -409,7 +434,11 @@ async def get_message_cache(inter, is_ephemeral: bool = commands.Param(default=T
             reactions = ", ".join(str(reaction.emoji)+f" ({reaction.count})" for reaction in msg.reactions)
             embed.add_field(name="Reactions", value=reactions, inline=False)
 
-        await inter.followup.send(embed=embed, ephemeral=is_ephemeral)
+        embeds.append(embed)
+        index += 1
+
+    # Send the first embed with pagination controls
+    await inter.response.send_message(embed=embeds[0], view=PageEmbed(embeds), ephemeral=is_ephemeral)
 
 
 # Slash command to view the message cache
@@ -421,18 +450,20 @@ async def get_freedom_cache(inter, is_ephemeral: bool = commands.Param(default=T
 
     # queue empty
     deleted_messages = freedom_queue.get_messages(inter.guild.id)
+    deleted_messages.reverse()
     if not deleted_messages:
         await inter.response.send_message("The message cache is empty. The bot has likely been reset recently.", ephemeral=True)
         return
     
     # body
-    await inter.response.defer(ephemeral=is_ephemeral)
+    embeds = []
+    index = 1
     
     for msg in deleted_messages:
-        embed = disnake.Embed(title="Freedom History (mrrp mrrow)", color=disnake.Color.blue())
+        embed = disnake.Embed(title=f"Deleted Message ({index}/{len(deleted_messages)})", color=disnake.Color.blue())
         embed.add_field(name="Time", value=f"<t:{int(msg.created_at.timestamp())}:f>", inline=True)
         embed.add_field(name="Author", value=f"<@{msg.author.id}>", inline=True)
-
+        
         if msg.content:
             embed.add_field(name="Content", value=msg.content, inline=False)
 
@@ -444,7 +475,11 @@ async def get_freedom_cache(inter, is_ephemeral: bool = commands.Param(default=T
             reactions = ", ".join(str(reaction.emoji)+f" ({reaction.count})" for reaction in msg.reactions)
             embed.add_field(name="Reactions", value=reactions, inline=False)
 
-        await inter.followup.send(embed=embed, ephemeral=is_ephemeral)
+        embeds.append(embed)
+        index += 1
+
+    # Send the first embed with pagination controls
+    await inter.response.send_message(embed=embeds[0], view=PageEmbed(embeds), ephemeral=is_ephemeral)
 
 
 
