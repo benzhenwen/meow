@@ -18,8 +18,8 @@ You can opt in by dm-ing ben208 on discord. If you opt in, server members with "
 ## Moderator tools
 commands accessable through the "moderate members" permissions
 get_message_cache(is_ephemeral) is designed as a tool for moderators. (if message logging opted in)
-set_meow_chance(value) 0-1 sets the chance meow meows back
-set_nya_chance(value) 0-1 sets the chance meow :3 back
+set_meow_chance(value) 0-1 sets the chance meow meows back (default value = 0.05)
+set_nya_chance(value) 0-1 sets the chance meow :3 back (default value = 0.05)
 
 
 # Contribution
