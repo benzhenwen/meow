@@ -410,7 +410,7 @@ async def get_message_cache(inter, is_ephemeral: bool = commands.Param(default=T
     # Check if the user is the server owner or has the moderator role
     moderator_role_id = 1040564073445720124
     is_server_owner = inter.author.id == inter.guild.owner_id
-    has_moderator_role = any(role.id == moderator_role_id for role in inter.author.roles) or inter.author.id == 972654681706889216
+    has_moderator_role = any(role.id == moderator_role_id for role in inter.author.roles)
 
     if not (is_server_owner or has_moderator_role):
         await inter.response.send_message("no peeking owo~ (invalid permission)", ephemeral=True)
