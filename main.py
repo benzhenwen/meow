@@ -224,7 +224,7 @@ async def on_raw_message_edit(payload: disnake.RawMessageUpdateEvent):
 
 # message delete caching
 class DeletedMessageCache:
-    def __init__(self, capacity=50):
+    def __init__(self, capacity=25):
         self.server_queues = {}
         self.capacity = capacity
 
