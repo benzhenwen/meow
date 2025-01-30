@@ -312,8 +312,7 @@ async def on_raw_reaction(payload: disnake.RawReactionActionEvent, is_adding: bo
             emo = payload.emoji if payload.emoji.is_custom_emoji() else str(payload.emoji)
             dr = disnake.Reaction(message=message, emoji=emo, data={"count":1, "me":False, "emoji":emo})
             message.reactions.append(dr)
-        print(message.reactions)
-
+            
     await check_message_reactions(message)
 
 async def check_message_reactions(message: disnake.Message):
