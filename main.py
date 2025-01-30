@@ -464,7 +464,8 @@ async def get_message_cache(inter, is_ephemeral: bool = commands.Param(default=T
 
 
 # Slash command to view the message cache
-@bot.slash_command(description="View the freedom history.", guild_ids=[1040556771489611881])
+@bot.slash_command(description="View the freedom history.", 
+                   guild_ids=[1040556771489611881])
 async def get_freedom_cache(inter, is_ephemeral: bool = commands.Param(default=True, description="Make the response private")):
     if inter.guild.id != 1040556771489611881 or inter.channel.id != 1333441107027169371:
         await inter.response.send_message("This command cannot be used in this channel.", ephemeral=True)
