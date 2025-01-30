@@ -206,7 +206,7 @@ async def on_raw_message_edit(payload: disnake.RawMessageUpdateEvent):
     
     # bot has opinions 
     if message.guild.id == 1040556771489611881 and message.channel.id == 1333441107027169371 and message.content:
-        if "meow" in message.content.lower() > 0 or ":3" in message.content.lower():
+        if "meow" in message.content.lower() or ":3" in message.content.lower():
             try:
                 await message.add_reaction(emoji_cache["white_check_mark"])
             except Exception as e:
@@ -231,7 +231,7 @@ async def on_raw_message_edit(payload: disnake.RawMessageUpdateEvent):
 
 # message delete caching
 class DeletedMessageCache:
-    def __init__(self, capacity=50):
+    def __init__(self, capacity=25):
         self.server_queues = {}
         self.capacity = capacity
 
@@ -319,7 +319,7 @@ async def on_raw_reaction(payload: disnake.RawReactionActionEvent, is_adding: bo
                     reaction.message.reactions.remove(reaction)
                 break
         else:
-            emo = payload.emoji if payload.emoji.is_custom_emoji else str(payload.emoji)
+            emo = payload.emoji if payload.emoji.is_custom_emoji() else str(payload.emoji)
             dr = disnake.Reaction(message=message, emoji=emo, data={"count":1, "me":False, "emoji":emo})
             message.reactions.append(dr)
 
@@ -331,9 +331,9 @@ async def check_message_reactions(message: disnake.Message):
         x_count = 0
 
         for reac in message.reactions:
-            if reac.emoji == emoji_cache["white_check_mark"]:
+            if str(reac.emoji) == str(emoji_cache["white_check_mark"]):
                 white_check_count = reac.count
-            elif reac.emoji == emoji_cache["x"]:
+            elif str(reac.emoji) == str(emoji_cache["x"]):
                 x_count = reac.count
 
         # print(f"Checked message: {message.id}, ✅: {white_check_count}, ❌: {x_count}")
@@ -428,7 +428,7 @@ async def get_message_cache(inter, is_ephemeral: bool = commands.Param(default=T
     index = 1
     
     for msg in deleted_messages:
-        embed = disnake.Embed(title="Deleted Message ({index}/{len(deleted_messages)})", color=disnake.Color.red())
+        embed = disnake.Embed(title=f"Deleted Message ({index}/{len(deleted_messages)})", color=disnake.Color.red())
         embed.add_field(name="Time", value=f"<t:{int(msg.created_at.timestamp())}:f>", inline=True)
         embed.add_field(name="Author", value=f"<@{msg.author.id}>", inline=True)
         embed.add_field(name="Channel", value=f"<#{msg.channel.id}>", inline=True)
@@ -470,7 +470,7 @@ async def get_freedom_cache(inter, is_ephemeral: bool = commands.Param(default=T
     index = 1
     
     for msg in deleted_messages:
-        embed = disnake.Embed(title=f"Deleted Message ({index}/{len(deleted_messages)})", color=disnake.Color.blue())
+        embed = disnake.Embed(title=f"Freedom History ({index}/{len(deleted_messages)})", color=disnake.Color.blue())
         embed.add_field(name="Time", value=f"<t:{int(msg.created_at.timestamp())}:f>", inline=True)
         embed.add_field(name="Author", value=f"<@{msg.author.id}>", inline=True)
         
