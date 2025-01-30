@@ -17,6 +17,8 @@ except Exception as e:
     print(f"Error reading token.txt: {e}")
     exit(1)
 
+message_logging_servers = [1040556771489611881, 1028374460333572287]
+
 # Define intents
 intents = disnake.Intents.default()
 intents.messages = True  # Enable message-related intents
@@ -82,32 +84,33 @@ async def on_ready():
 
     # max size that each guild gets for message cache
     global message_cache
-    message_cache = LimitedMessageCache(max_size=math.floor(40000 / len(bot.guilds)))
-    print(f"Max cached messages per server ({len(bot.guilds)}) is {message_cache.max_size}")
+    message_cache = LimitedMessageCache(max_size=math.floor(40000 / len(message_logging_servers)))
+    print(f"Max cached messages per server ({len(message_logging_servers)}) is {message_cache.max_size}")
 
     for guild in bot.guilds:
         sqlite_handler.setup_tables_for_server(guild.id)
         print("setup server database: " + str(guild.id) + " - " + guild.name)
 
-        max_cache_per_channel = min(250, math.floor((message_cache.max_size / len(guild.channels) / 2)))
-        print(f"limiting cache per channel size to: {max_cache_per_channel}")
+        if guild.id in message_logging_servers: # opt into message logging
+            max_cache_per_channel = min(250, math.floor((message_cache.max_size / len(guild.channels) / 2)))
+            print(f"limiting cache per channel size to: {max_cache_per_channel}")
 
-        for channel in guild.channels:
-            try:
-                count = 0
-                async for message in channel.history(limit=max_cache_per_channel):  # Adjust limit as needed
-                    if message:
-                        message_cache.add(message) # Cache messages
-                        count += 1
-                        if guild.id == 1040556771489611881 and channel.id == 1333441107027169371 and message.reactions:
-                            await check_message_reactions(message)
-                print(f"Cached {count} recent messages for {guild.name} - {channel.name}")
-            except disnake.Forbidden as e:
-                pass # no access to channel
-            except AttributeError as e:
-                pass # channel has no history
-            except Exception as e:
-                print(f"Error fetching message history: {e}")
+            for channel in guild.channels:
+                try:
+                    count = 0
+                    async for message in channel.history(limit=max_cache_per_channel):  # Adjust limit as needed
+                        if message:
+                            message_cache.add(message) # Cache messages
+                            count += 1
+                            if guild.id == 1040556771489611881 and channel.id == 1333441107027169371 and message.reactions:
+                                await check_message_reactions(message)
+                    print(f"Cached {count} recent messages for {guild.name} - {channel.name}")
+                except disnake.Forbidden as e:
+                    pass # no access to channel
+                except AttributeError as e:
+                    pass # channel has no history
+                except Exception as e:
+                    print(f"Error fetching message history: {e}")
         
     print("Setup Complete")
 
@@ -118,7 +121,8 @@ async def on_guild_join(guild: disnake.Guild):
 
 @bot.event
 async def on_message(message: disnake.Message):
-    message_cache.add(message)
+    if message.guild.id in message_logging_servers: # opt into message logging
+        message_cache.add(message)
 
     meow_count = message.content.lower().count("meow") if message.content else 0
 
@@ -182,6 +186,9 @@ async def on_message(message: disnake.Message):
 # whenever you edit a message
 @bot.event
 async def on_raw_message_edit(payload: disnake.RawMessageUpdateEvent):
+    if not payload.guild_id in message_logging_servers: # opt into message logging
+        return
+
     # fetch the channel
     guild = disnake.utils.get(bot.guilds, id=payload.guild_id)
     if not guild:
@@ -242,6 +249,9 @@ moderator_queue = DeletedMessageCache()
 
 @bot.event
 async def on_raw_message_delete(payload: disnake.RawMessageDeleteEvent):
+    if not payload.guild_id in message_logging_servers: # opt into message logging
+        return
+        
     # fetch the channel
     guild = disnake.utils.get(bot.guilds, id=payload.guild_id)
     if not guild:
@@ -278,7 +288,7 @@ async def on_raw_reaction_remove(payload: disnake.RawReactionActionEvent):
 # cache channel
 freedom_channel = None
 async def on_raw_reaction(payload: disnake.RawReactionActionEvent, is_adding: bool):
-    if payload.guild_id != 1040556771489611881 or payload.channel_id != 1333441107027169371:
+    if payload.guild_id != 1040556771489611881 or payload.channel_id != 1333441107027169371: # server specific (floof squad)
         return
     
     global freedom_channel
@@ -394,7 +404,7 @@ class PageEmbed(disnake.ui.View):
             await interaction.response.defer()  # No page change
 
 # Slash command to view the message cache
-@bot.slash_command(description="View the deleted message cache for this server.")
+@bot.slash_command(description="View the deleted message cache for this server.", guild_ids=message_logging_servers)
 async def get_message_cache(inter, is_ephemeral: bool = commands.Param(default=True, description="Make the response private")):
 
     # Check if the user is the server owner or has the moderator role
