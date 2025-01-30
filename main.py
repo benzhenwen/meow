@@ -381,11 +381,11 @@ async def leaderboard(inter, is_ephemeral: bool = commands.Param(default=True, d
     await inter.response.send_message(leaderboard_message, ephemeral=is_ephemeral)
 
 # settings set commands
-@bot.slash_command(description="Set the likeleyhood that the bot meows back", default_member_permissions=disnake.Permissions(manage_guild=True, moderate_members=True))
+@bot.slash_command(description="Set the likeleyhood that the bot meows back", default_member_permissions=disnake.Permissions(moderate_members=True))
 async def set_meow_chance(inter, value: float = commands.Param(description="chance (0-1)", lt=1.0, gt=0.0)):
     sqlite_handler.set_settings_value(inter.guild.id, "meowchance", value)
 
-@bot.slash_command(description="Set the likeleyhood that the bot :3 back", default_member_permissions=disnake.Permissions(manage_guild=True, moderate_members=True))
+@bot.slash_command(description="Set the likeleyhood that the bot :3 back", default_member_permissions=disnake.Permissions(moderate_members=True))
 async def set_nya_chance(inter, value: float = commands.Param(description="chance (0-1)", lt=1.0, gt=0.0)):
     sqlite_handler.set_settings_value(inter.guild.id, "nyachance", value)
 
@@ -416,7 +416,7 @@ class PageEmbed(disnake.ui.View):
 # Slash command to view the message cache
 @bot.slash_command(description="View the deleted message cache for this server.", 
                    guild_ids=message_logging_servers, 
-                   default_member_permissions=disnake.Permissions(manage_guild=True, moderate_members=True))
+                   default_member_permissions=disnake.Permissions(moderate_members=True))
 async def get_message_cache(inter, is_ephemeral: bool = commands.Param(default=True, description="Make the response private")):
 
     # Check if the user is the server owner or has the moderator role
