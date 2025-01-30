@@ -199,7 +199,7 @@ async def on_raw_message_edit(payload: disnake.RawMessageUpdateEvent):
     
     # bot has opinions 
     if message.guild.id == 1040556771489611881 and message.channel.id == 1333441107027169371 and message.content:
-        if "meow" in message.content.lower() > 0 or ":3" in message.content.lower():
+        if "meow" in message.content.lower() or ":3" in message.content.lower():
             try:
                 await message.add_reaction(emoji_cache["white_check_mark"])
             except Exception as e:
