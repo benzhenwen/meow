@@ -384,10 +384,12 @@ async def leaderboard(inter, is_ephemeral: bool = commands.Param(default=True, d
 @bot.slash_command(description="Set the likeleyhood that the bot meows back", default_member_permissions=disnake.Permissions(moderate_members=True))
 async def set_meow_chance(inter, value: float = commands.Param(description="chance (0-1)", lt=1.0, gt=0.0)):
     sqlite_handler.set_settings_value(inter.guild.id, "meowchance", value)
+    await inter.response.send_message(f"Meow chance set successfully to {value}", ephemeral=True)
 
 @bot.slash_command(description="Set the likeleyhood that the bot :3 back", default_member_permissions=disnake.Permissions(moderate_members=True))
 async def set_nya_chance(inter, value: float = commands.Param(description="chance (0-1)", lt=1.0, gt=0.0)):
     sqlite_handler.set_settings_value(inter.guild.id, "nyachance", value)
+    await inter.response.send_message(f"Meow nya set successfully to {value}", ephemeral=True)
 
 # message cache embed
 class PageEmbed(disnake.ui.View):

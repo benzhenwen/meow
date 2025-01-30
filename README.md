@@ -13,9 +13,14 @@ leaderboard(is_ephemeral)          - View the top 10 meow counts
 ## Privacy
 Your messages are in no way stored (including overriding Disnake's default caching system). Unless opted in, meow will only ever view a message once to determine a few basic behaviours and count the number of meows.
 
-You can opt in by dm-ing ben208 on discord. If you opt in, your server's administrators (and any specified roles) will be given access to a new command: get_message_cache(is_ephemeral), that will display up to the latest 25 deleted messages on your server.
+You can opt in by dm-ing ben208 on discord. If you opt in, server members with "moderate members" permissions will be given access to a new command: get_message_cache(is_ephemeral), that will display up to the latest 25 deleted messages on your server.
 
-get_message_cache(is_ephemeral) is designed as a tool for moderators.
+## Moderator tools
+commands accessable through the "moderate members" permissions
+get_message_cache(is_ephemeral) is designed as a tool for moderators. (if message logging opted in)
+set_meow_chance(value) 0-1 sets the chance meow meows back
+set_nya_chance(value) 0-1 sets the chance meow :3 back
+
 
 # Contribution
 You are welcome to clone and run this bot yourself, but please do not submit any merge requests.
