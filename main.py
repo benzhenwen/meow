@@ -89,7 +89,7 @@ async def on_ready():
         sqlite_handler.setup_tables_for_server(guild.id)
         print("setup server database: " + str(guild.id) + " - " + guild.name)
 
-        max_cache_per_channel = 10 #min(250, math.floor((message_cache.max_size / len(guild.channels) / 2)))
+        max_cache_per_channel = min(250, math.floor((message_cache.max_size / len(guild.channels) / 2)))
         print(f"limiting cache per channel size to: {max_cache_per_channel}")
 
         for channel in guild.channels:
@@ -312,7 +312,7 @@ async def on_raw_reaction(payload: disnake.RawReactionActionEvent, is_adding: bo
             emo = payload.emoji if payload.emoji.is_custom_emoji() else str(payload.emoji)
             dr = disnake.Reaction(message=message, emoji=emo, data={"count":1, "me":False, "emoji":emo})
             message.reactions.append(dr)
-            
+
     await check_message_reactions(message)
 
 async def check_message_reactions(message: disnake.Message):
