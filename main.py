@@ -386,7 +386,7 @@ async def set_meow_chance(inter, value: float = commands.Param(description="chan
     sqlite_handler.set_settings_value(inter.guild.id, "meowchance", value)
 
 @bot.slash_command(description="Set the likeleyhood that the bot :3 back", default_member_permissions=disnake.Permissions(manage_guild=True, moderate_members=True))
-async def set_meow_chance(inter, value: float = commands.Param(description="chance (0-1)", lt=1.0, gt=0.0)):
+async def set_nya_chance(inter, value: float = commands.Param(description="chance (0-1)", lt=1.0, gt=0.0)):
     sqlite_handler.set_settings_value(inter.guild.id, "nyachance", value)
 
 # message cache embed
