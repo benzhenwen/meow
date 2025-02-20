@@ -87,6 +87,7 @@ async def on_ready():
     message_cache = LimitedMessageCache(max_size=math.floor(40000 / len(message_logging_servers)))
     print(f"Max cached messages per server ({len(message_logging_servers)}) is {message_cache.max_size}")
 
+    print("<<<------------------------------------------------------------------------------>>>")
     for guild in bot.guilds:
         sqlite_handler.setup_tables_for_server(guild.id)
         print("setup server database: " + str(guild.id) + " - " + guild.name)
@@ -111,6 +112,8 @@ async def on_ready():
                     pass # channel has no history
                 except Exception as e:
                     print(f"Error fetching message history: {e}")
+        
+        print("<<<------------------------------------------------------------------------------>>>")
         
     print("Setup Complete")
 
