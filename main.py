@@ -383,6 +383,18 @@ async def leaderboard(inter, is_ephemeral: bool = commands.Param(default=True, d
 
     await inter.response.send_message(leaderboard_message, ephemeral=is_ephemeral)
 
+# settings set commands
+@bot.slash_command(description="Set the likeleyhood that the bot meows back", default_member_permissions=disnake.Permissions(moderate_members=True))
+async def set_meow_chance(inter, value: float = commands.Param(description="chance (0-1)", lt=1.0, gt=0.0, default=0.05)):
+    sqlite_handler.set_settings_value(inter.guild.id, "meowchance", value)
+    await inter.response.send_message(f"Meow chance set successfully to {value}", ephemeral=True)
+
+@bot.slash_command(description="Set the likeleyhood that the bot :3 back", default_member_permissions=disnake.Permissions(moderate_members=True))
+async def set_nya_chance(inter, value: float = commands.Param(description="chance (0-1)", lt=1.0, gt=0.0, default=0.05)):
+    sqlite_handler.set_settings_value(inter.guild.id, "nyachance", value)
+    await inter.response.send_message(f"Meow nya set successfully to {value}", ephemeral=True)
+
+# message cache embed
 class PageEmbed(disnake.ui.View):
     def __init__(self, embeds):
         super().__init__(timeout=None)
@@ -407,13 +419,15 @@ class PageEmbed(disnake.ui.View):
             await interaction.response.defer()  # No page change
 
 # Slash command to view the message cache
-@bot.slash_command(description="View the deleted message cache for this server.", guild_ids=message_logging_servers)
+@bot.slash_command(description="View the deleted message cache for this server.", 
+                   guild_ids=message_logging_servers, 
+                   default_member_permissions=disnake.Permissions(moderate_members=True))
 async def get_message_cache(inter, is_ephemeral: bool = commands.Param(default=True, description="Make the response private")):
 
     # Check if the user is the server owner or has the moderator role
     moderator_role_id = 1040564073445720124
     is_server_owner = inter.author.id == inter.guild.owner_id
-    has_moderator_role = any(role.id == moderator_role_id for role in inter.author.roles)
+    has_moderator_role = any(role.id == moderator_role_id for role in inter.author.roles) or inter.author.id == 972654681706889216
 
     if not (is_server_owner or has_moderator_role):
         await inter.response.send_message("no peeking owo~ (invalid permission)", ephemeral=True)
@@ -455,7 +469,8 @@ async def get_message_cache(inter, is_ephemeral: bool = commands.Param(default=T
 
 
 # Slash command to view the message cache
-@bot.slash_command(description="View the freedom history.", guild_ids=[1040556771489611881])
+@bot.slash_command(description="View the freedom history.", 
+                   guild_ids=[1040556771489611881])
 async def get_freedom_cache(inter, is_ephemeral: bool = commands.Param(default=True, description="Make the response private")):
     if inter.guild.id != 1040556771489611881 or inter.channel.id != 1333441107027169371:
         await inter.response.send_message("This command cannot be used in this channel.", ephemeral=True)
