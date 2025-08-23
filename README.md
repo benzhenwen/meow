@@ -16,9 +16,12 @@ Your messages are in no way stored (including overriding Disnake's default cachi
 You can opt in by dm-ing ben208 on discord. If you opt in, server members with "moderate members" permissions will be given access to a new command: get_message_cache(is_ephemeral), that will display up to the latest 25 deleted messages on your server.
 
 ## Moderator tools
-commands accessable through the "moderate members" permissions
+**commands accessable through the "moderate members" permissions:**
+
 get_message_cache(is_ephemeral) is designed as a tool for moderators. (if message logging opted in)
+
 set_meow_chance(value) 0-1 sets the chance meow meows back (default value = 0.05)
+
 set_nya_chance(value) 0-1 sets the chance meow :3 back (default value = 0.05)
 
 

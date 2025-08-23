@@ -36,26 +36,39 @@ def setup_tables_for_server(server_id):
     table_name = f"Server_{server_id}"
     create_table_query = f"""
     CREATE TABLE IF NOT EXISTS {table_name} (
-        name TEXT NOT NULL,
+        name TEXT NOT NULL PRIMARY KEY,
         count INTEGER NOT NULL
     );
     """
     try:
         conn_meows_cursor.execute(create_table_query)
         conn_meows.commit()
+        print("Setup meow table: " + table_name)
     except Exception as e:
         print(f"Error creating table '{table_name}' for meows.db: {e}")
 
     #table settings
     create_table_query = f"""
     CREATE TABLE IF NOT EXISTS {table_name} (
-        name TEXT NOT NULL,
+        name TEXT NOT NULL PRIMARY KEY,
         value DOUBLE NOT NULL
     );
     """
     try:
-        conn_meows_cursor.execute(create_table_query)
+        conn_settings_cursor.execute(create_table_query)
         conn_meows.commit()
+
+        query_settings_update = f"INSERT INTO {table_name} (name, value) VALUES (?, ?)"
+        try:
+            conn_settings_cursor.execute(query_settings_update, ("meowchance", 0.05))
+            conn_settings.commit()
+            conn_settings_cursor.execute(query_settings_update, ("nyachance", 0.05))
+            conn_settings.commit()
+            print(f"New Server Settings Initialized: " + table_name)
+        except sqlite3.Error as e:
+            pass
+
+        print("Setup settings table: " + table_name)
     except Exception as e:
         print(f"Error creating table '{table_name}' for settings.db: {e}")
 
@@ -97,7 +110,17 @@ def set_meow_value(server_id, user_id, value):
         print(f"Error updating meow value for user_id '{user_id}' in table '{table_name}': {e}")
 
 def add_meows(server_id, user_id, count):
-    set_meow_value(server_id, user_id, query_meow_value(server_id, user_id) + count)
+    table_name = f"Server_{server_id}"
+    query = f"""
+    INSERT INTO {table_name} (name, count) 
+    VALUES (?, ?) 
+    ON CONFLICT(name) DO UPDATE SET count = count + excluded.count
+    """
+    try:
+        conn_meows_cursor.execute(query, (user_id, count))
+        conn_meows.commit()
+    except sqlite3.Error as e:
+        print(f"Error updating meow value for user_id '{user_id}' in table '{table_name}': {e}")
 
 def set_settings_value(server_id, setting_name, value):
     table_name = f"Server_{server_id}"

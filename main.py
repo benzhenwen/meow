@@ -87,6 +87,7 @@ async def on_ready():
     message_cache = LimitedMessageCache(max_size=math.floor(40000 / len(message_logging_servers)))
     print(f"Max cached messages per server ({len(message_logging_servers)}) is {message_cache.max_size}")
 
+    print("<<<------------------------------------------------------------------------------>>>")
     for guild in bot.guilds:
         sqlite_handler.setup_tables_for_server(guild.id)
         print("setup server database: " + str(guild.id) + " - " + guild.name)
@@ -127,6 +128,8 @@ async def on_ready():
         print("Sent DM with IP")
     except Exception as e:
         print(f"Failed to send DM: {e}")
+        
+        print("<<<------------------------------------------------------------------------------>>>")
         
     print("Setup Complete")
 
@@ -287,7 +290,7 @@ async def on_raw_message_delete(payload: disnake.RawMessageDeleteEvent):
         
     if message.guild and message.author:
         if message.guild.id == 1040556771489611881 and message.channel.id == 1333441107027169371:
-            freedom_queue.add_message(message.guild.id, message)
+            freedom_queue.add_message(message.guild.id, message) # floof squad
         else:
             moderator_queue.add_message(message.guild.id, message)
     else:
@@ -304,7 +307,7 @@ async def on_raw_reaction_remove(payload: disnake.RawReactionActionEvent):
 # cache channel
 freedom_channel = None
 async def on_raw_reaction(payload: disnake.RawReactionActionEvent, is_adding: bool):
-    if payload.guild_id != 1040556771489611881 or payload.channel_id != 1333441107027169371: # server specific (floof squad)
+    if payload.guild_id not in message_logging_servers:
         return
     
     global freedom_channel
@@ -339,7 +342,8 @@ async def on_raw_reaction(payload: disnake.RawReactionActionEvent, is_adding: bo
             dr = disnake.Reaction(message=message, emoji=emo, data={"count":1, "me":False, "emoji":emo})
             message.reactions.append(dr)
 
-    await check_message_reactions(message)
+    if message.guild.id == 1040556771489611881 and message.channel.id == 1333441107027169371: # floof squad - three strikes
+        await check_message_reactions(message)
 
 async def check_message_reactions(message: disnake.Message):
     try:
