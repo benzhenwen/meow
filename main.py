@@ -111,6 +111,22 @@ async def on_ready():
                     pass # channel has no history
                 except Exception as e:
                     print(f"Error fetching message history: {e}")
+
+                    # Send DM to owner with current IP
+    try:
+        import subprocess
+        def get_ip():
+            try:
+                ips = subprocess.check_output(["hostname", "-I"], text=True).strip().split()
+                return ips[0] if ips else "unknown"
+            except Exception:
+                return "unknown"
+
+        user = await bot.fetch_user(972654681706889216)
+        await user.send(f"Meow Bot has connected. IP: {get_ip()}")
+        print("Sent DM with IP")
+    except Exception as e:
+        print(f"Failed to send DM: {e}")
         
     print("Setup Complete")
 
