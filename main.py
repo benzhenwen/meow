@@ -80,7 +80,6 @@ async def on_ready():
     cache_emoji(1040556771489611881, 1189037275724656801, "fen_bonk")   # fen_bonk
     cache_emoji(None, "\u2705", "white_check_mark")                     # white_check_mark
     cache_emoji(None, "\u274c", "x")                                    # x
-    cache_emoji(None, "\uD83E\uDEC3", "pregnant_man")                   # pregnant_man
 
     # max size that each guild gets for message cache
     global message_cache
@@ -113,18 +112,10 @@ async def on_ready():
                 except Exception as e:
                     print(f"Error fetching message history: {e}")
 
-                    # Send DM to owner with current IP
+    # Send DM to owner about startup
     try:
-        import subprocess
-        def get_ip():
-            try:
-                ips = subprocess.check_output(["hostname", "-I"], text=True).strip().split()
-                return ips[0] if ips else "unknown"
-            except Exception:
-                return "unknown"
-
         user = await bot.fetch_user(972654681706889216)
-        await user.send(f"Meow Bot has connected. IP: {get_ip()}")
+        await user.send(f"Meow Bot has connected right meow!")
         print("Sent DM with IP")
     except Exception as e:
         print(f"Failed to send DM: {e}")
@@ -187,13 +178,6 @@ async def on_message(message: disnake.Message):
             await message.add_reaction(emoji_cache["frank"])
         except Exception as e:
             print(f"Failed to add reaction frank after mention: {e}")
-        
-    # rob pregananant 
-    if message.author.id == 1028450411012706314 and random.random() < 0.02:
-        try:
-            await message.add_reaction(emoji_cache["pregnant_man"])
-        except Exception as e:
-            print(f"Failed to add reaction pregnant_man: {e}")
 
     # crafty hammer 
     if message.author.id == 590979003431649283 and random.random() < 0.02:
