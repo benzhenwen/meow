@@ -147,17 +147,19 @@ async def on_message(message: disnake.Message):
 
     meow_count = message_content(message).count("meow") if message.content else 0
 
+    woof_count = message.content.lower().count("woof") if message.content else 0 # TEMP
+
     # bot has opinions 
     if message.guild.id == 1040556771489611881 and message.channel.id == 1333441107027169371 and message.content:
         if meow_count > 0 or ":3" in message_content(message):
             try:
-                await message.add_reaction(emoji_cache["white_check_mark"])
+                await message.add_reaction(emoji_cache["x"])
             except Exception as e:
                 pass
         
         if "woof" in message_content(message) or "chirr" in message_content(message):
             try:
-                await message.add_reaction(emoji_cache["x"])
+                await message.add_reaction(emoji_cache["white_check_mark"])
             except Exception as e:
                 pass
 
@@ -181,7 +183,15 @@ async def on_message(message: disnake.Message):
                 await message.channel.send(":3")
             except Exception as e:
                 print(f"Failed to nya~~~~ :( am sad: {e}")
-
+    
+    # TEMP
+    if woof_count > 0:
+        if random.random() < 0.05:
+            try:
+                await message.channel.send("woof")
+            except Exception as e:
+                print(f"Failed to woof :) am happy: {e}")
+    
 
     # Emoji reaction after mention
     if bot.user.mentioned_in(message):
