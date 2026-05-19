@@ -1,13 +1,23 @@
 import disnake
 from disnake.ext import commands
+from disnake import Message
 
 import sqlite_handler
+
+import unicodedata
 
 import math
 import random
 import asyncio
 from collections import OrderedDict
 from collections import deque
+
+
+# anti cheat :3
+def message_content(message: Message):
+    return message.content.lower()
+    # return unicodedata.normalize("NFKD", message.content).encode("ascii", "ignore").decode('utf-8').lower()
+
 
 # Fetch the token from token.txt
 try:
@@ -128,6 +138,7 @@ async def on_ready():
         
     print("Setup Complete")
 
+
 # guild setup stuff with db
 @bot.event
 async def on_guild_join(guild: disnake.Guild):
@@ -138,17 +149,17 @@ async def on_message(message: disnake.Message):
     if message.guild.id in message_logging_servers: # opt into message logging
         message_cache.add(message)
 
-    meow_count = message.content.lower().count("meow") if message.content else 0
+    meow_count = message_content(message).count("meow") if message.content else 0
 
     # bot has opinions 
     if message.guild.id == 1040556771489611881 and message.channel.id == 1333441107027169371 and message.content:
-        if meow_count > 0 or ":3" in message.content.lower():
+        if meow_count > 0 or ":3" in message_content(message):
             try:
                 await message.add_reaction(emoji_cache["white_check_mark"])
             except Exception as e:
                 pass
         
-        if "woof" in message.content.lower() or "chirr" in message.content.lower():
+        if "woof" in message_content(message) or "chirr" in message_content(message):
             try:
                 await message.add_reaction(emoji_cache["x"])
             except Exception as e:
@@ -168,13 +179,13 @@ async def on_message(message: disnake.Message):
             except Exception as e:
                 print(f"Failed to meow :( am sad: {e}")
             
-    if message.content and ":3" in message.content.lower():
+    if message.content and ":3" in message_content(message):
         if random.random() < sqlite_handler.query_setting_value(message.guild.id, "nyachance"):
             try:
                 await message.channel.send(":3")
             except Exception as e:
                 print(f"Failed to nya~~~~ :( am sad: {e}")
-
+    
 
     # Emoji reaction after mention
     if bot.user.mentioned_in(message):
@@ -224,7 +235,7 @@ async def on_raw_message_edit(payload: disnake.RawMessageUpdateEvent):
     
     # bot has opinions 
     if message.guild.id == 1040556771489611881 and message.channel.id == 1333441107027169371 and message.content:
-        if "meow" in message.content.lower() or ":3" in message.content.lower():
+        if "meow" in message_content(message) or ":3" in message_content(message):
             try:
                 await message.add_reaction(emoji_cache["white_check_mark"])
             except Exception as e:
@@ -235,7 +246,7 @@ async def on_raw_message_edit(payload: disnake.RawMessageUpdateEvent):
             except Exception as e:
                 pass
         
-        if "woof" in message.content.lower() or "chirr" in message.content.lower():
+        if "woof" in message_content(message) or "chirr" in message_content(message):
             try:
                 await message.add_reaction(emoji_cache["x"])
             except Exception as e:
