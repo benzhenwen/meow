@@ -80,6 +80,10 @@ async def on_ready():
     cache_emoji(1040556771489611881, 1189037275724656801, "fen_bonk")   # fen_bonk
     cache_emoji(None, "\u2705", "white_check_mark")                     # white_check_mark
     cache_emoji(None, "\u274c", "x")                                    # x
+    cache_emoji(None, "\uD83C\uDDE8", "letter_C")
+    cache_emoji(None, "\uD83C\uDDEA", "letter_U")
+    cache_emoji(None, "\uD83C\uDDF9", "letter_T")
+    cache_emoji(None, "\uD83C\uDDEA", "letter_E")
 
     # max size that each guild gets for message cache
     global message_cache
@@ -185,6 +189,17 @@ async def on_message(message: disnake.Message):
             await message.add_reaction(emoji_cache["fen_bonk"])
         except Exception as e:
             print(f"Failed to add reaction fen_bonk: {e}")
+    
+    # Evan is cute
+    if message.author.id == 1156417904061993012 and random.random() < 0.02:
+        try:
+            await message.add_reaction(emoji_cache["letter_C"])
+            await message.add_reaction(emoji_cache["letter_U"])
+            await message.add_reaction(emoji_cache["letter_T"])
+            await message.add_reaction(emoji_cache["letter_E"])
+        except Exception as e:
+            print(f"Failed to add reaction cute reaction to evan: {e}")
+
 
 # whenever you edit a message
 @bot.event
