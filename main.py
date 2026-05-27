@@ -97,7 +97,7 @@ async def on_ready():
 
     # max size that each guild gets for message cache
     global message_cache
-    message_cache = LimitedMessageCache(max_size=math.floor(40000 / len(message_logging_servers)))
+    message_cache = LimitedMessageCache(max_size=math.floor(10000 / len(message_logging_servers)))
     print(f"Max cached messages per server ({len(message_logging_servers)}) is {message_cache.max_size}")
 
     print("<<<------------------------------------------------------------------------------>>>")
@@ -204,6 +204,7 @@ async def on_message(message: disnake.Message):
     # Evan is cute
     if message.author.id == 1156417904061993012 and random.random() < 0.02:
         try:
+            print(f"socute...")
             await message.add_reaction(emoji_cache["letter_C"])
             await message.add_reaction(emoji_cache["letter_U"])
             await message.add_reaction(emoji_cache["letter_T"])
