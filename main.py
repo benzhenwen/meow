@@ -90,10 +90,10 @@ async def on_ready():
     cache_emoji(1040556771489611881, 1189037275724656801, "fen_bonk")   # fen_bonk
     cache_emoji(None, "\u2705", "white_check_mark")                     # white_check_mark
     cache_emoji(None, "\u274c", "x")                                    # x
-    cache_emoji(None, "\uD83C\uDDE8", "letter_C")
-    cache_emoji(None, "\uD83C\uDDEA", "letter_U")
-    cache_emoji(None, "\uD83C\uDDF9", "letter_T")
-    cache_emoji(None, "\uD83C\uDDEA", "letter_E")
+    cache_emoji(None, "🇨", "letter_C")
+    cache_emoji(None, "🇺", "letter_U")
+    cache_emoji(None, "🇹", "letter_T")  
+    cache_emoji(None, "🇪", "letter_E")
 
     # max size that each guild gets for message cache
     global message_cache
