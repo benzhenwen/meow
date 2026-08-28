@@ -4,8 +4,8 @@ TASK_KEY="$1"
 SESSION_DIR="$(pwd)/c_sessions/user_${TASK_KEY}_session"
 
 cleanup() {
-    # rm -rf "$SESSION_DIR"
-    echo meow > "meow.txt"
+    rm -rf "$SESSION_DIR"
+    # echo meow > "meow.txt"
 }
 
 trap cleanup EXIT
