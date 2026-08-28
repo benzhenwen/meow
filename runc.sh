@@ -1,20 +1,43 @@
 #!/bin/bash
 
-TASK_KEY=$1
-CODE_INPUT=$(cat)
+TASK_KEY="$1"
+SESSION_DIR="$(pwd)/c_sessions/user_${TASK_KEY}_session"
 
-cd c_sessions
-mkdir "user_${TASK_KEY}_session"
-cd "user_${TASK_KEY}_session"
+cleanup() {
+    # rm -rf "$SESSION_DIR"
+    echo meow > "meow.txt"
+}
 
-echo $CODE_INPUT > main.c
-gcc main.c -o main > output_compile.txt
+trap cleanup EXIT
+trap 'exit 143' TERM
+trap 'exit 130' INT
 
-if [ $? -eq 0 ]; then
-    ./main
-else
-    echo "FAILED TO COMPILE:"
-    echo output_compile.txt
+mkdir -p "$SESSION_DIR"
 
-cd ..
-rm -rf "user_${TASK_KEY}_session"
+# Preserve submitted code exactly
+cat > "$SESSION_DIR/main.c"
+
+docker run \
+    --rm \
+    --network none \
+    --memory 1024m \
+    --cpus 0.5 \
+    --pids-limit 32 \
+    --cap-drop ALL \
+    --security-opt no-new-privileges \
+    --user 65534:65534 \
+    --tmpfs /work:rw,exec,nosuid,nodev,size=64m,mode=1777 \
+    -v "$SESSION_DIR:/input:ro" \
+    -w /work \
+    gcc:14 \
+    sh -c '
+        gcc /input/main.c -o /work/main 2> /work/compile_errors.txt
+
+        if [ $? -ne 0 ]; then
+            echo "FAILED TO COMPILE:"
+            cat /work/compile_errors.txt
+            exit 1
+        fi
+
+        timeout 10s /work/main
+    '

@@ -6,6 +6,8 @@ import sqlite_handler
 
 import subprocess
 import threading
+import os
+import signal
 
 import math
 import random
@@ -224,42 +226,78 @@ async def on_message(message: disnake.Message):
 
         # check lock
         if id in c_event_sessions:
-            message.reply(f"@<${id}> You already have an active running code execution!")
+            await message.reply(f"{message.author.mention} You already have an active running code execution!")
             return
 
-        # start process for user and lock
-        process = subprocess.Popen(
-            ["bash", "runc.sh", str(id)],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True
+        # strip start and end line in case of special
+        content = message.content.strip()
+
+        if content.lower().startswith("```c") and content.endswith("```"):
+            content = content[4:-3].strip()
+
+        # start process
+        await run_c_code(message, message.channel, id, content)
+
+
+async def run_c_code(message, channel, user_id, code):
+    global c_event_sessions
+
+    process = await asyncio.create_subprocess_exec(
+        "bash",
+        "runc.sh",
+        str(user_id),
+        stdin=asyncio.subprocess.PIPE,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+        start_new_session=True
+    )
+
+    c_event_sessions[user_id] = process
+
+    try:
+        try:
+            stdout_data, stderr_data = await asyncio.wait_for(
+                process.communicate(input=code.encode()),
+                timeout=30
+            )
+
+        except asyncio.TimeoutError:
+            print(f"Task '{user_id}' timed out.")
+            await message.reply(f"{message.author.mention} Your execution timed out!")
+
+            # Kill bash and ./main 
+            os.killpg(process.pid, signal.SIGTERM)
+
+            try:
+                await asyncio.wait_for(process.wait(), timeout=2)
+            except asyncio.TimeoutError:
+                # Force kill anything that refused SIGTERM
+                os.killpg(process.pid, signal.SIGKILL)
+                await process.wait()
+
+        stdout = stdout_data.decode(errors="replace")
+        stderr = stderr_data.decode(errors="replace")
+
+        print(
+            f"Task '{user_id}' finished "
+            f"with exit code {process.returncode}"
         )
 
-        c_event_sessions[id] = process
-        print(f"Started c task '{id}' with PID '{process.pid}'")
+        if stdout:
+            if (len(stdout.strip()) > 2000):
+                await channel.send("Program output >2000 characters!")
+                return
+            await channel.send(stdout.strip())
+            return
 
-        # send user input code
-        process.stdin.write(message.content)
-        process.stdin.close()
+        if stderr:
+            if (len(stdout.strip()) > 1990):
+                await channel.send("Program ERROR output >2000 characters!")
+                return
+            await channel.send(f"Error:\n{stderr.strip()}")
 
-        # Waits for a process to finish, then executes callback code.
-        watcher_thread = threading.Thread(
-            target=watch_and_callback,
-            args=(id, process),
-            daemon=True
-        )
-        watcher_thread.start()
-
-
-def watch_and_callback(id, process):
-    stdout_data, stderr_data = process.communicate()
-    
-    print(f"\n[CALLBACK] Task '{id}' has finished!")
-    if stdout_data:
-        print(f"Output:\n{stdout_data.strip()}")
-    if stderr_data:
-        print(f"Errors:\n{stderr_data.strip()}")
+    finally:
+        c_event_sessions.pop(user_id, None)
 
 
 
