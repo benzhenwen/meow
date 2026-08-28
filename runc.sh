@@ -40,4 +40,11 @@ docker run \
         fi
 
         timeout 10s /work/main
+        status=$?
+
+        if [ "$status" -eq 124 ]; then
+            echo "TIMEOUT: program exceeded 10 seconds"
+        fi
+
+        exit "$status"
     '
