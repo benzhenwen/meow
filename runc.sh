@@ -35,7 +35,9 @@ docker run \
 
         if [ $? -ne 0 ]; then
             echo "FAILED TO COMPILE:"
+            printf "\140\140\140\n"
             cat /work/compile_errors.txt
+            printf "\140\140\140\n"
             exit 1
         fi
 
