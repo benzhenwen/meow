@@ -91,14 +91,14 @@ async def on_ready():
     cache_emoji(1040556771489611881, 1189037275724656801, "fen_bonk")   # fen_bonk
     cache_emoji(None, "\u2705", "white_check_mark")                     # white_check_mark
     cache_emoji(None, "\u274c", "x")                                    # x
-    cache_emoji(None, "\uD83C\uDDE8", "letter_C")
-    cache_emoji(None, "\uD83C\uDDEA", "letter_U")
-    cache_emoji(None, "\uD83C\uDDF9", "letter_T")
-    cache_emoji(None, "\uD83C\uDDEA", "letter_E")
+    cache_emoji(None, "🇨", "letter_C")
+    cache_emoji(None, "🇺", "letter_U")
+    cache_emoji(None, "🇹", "letter_T")  
+    cache_emoji(None, "🇪", "letter_E")
 
     # max size that each guild gets for message cache
     global message_cache
-    message_cache = LimitedMessageCache(max_size=math.floor(40000 / len(message_logging_servers)))
+    message_cache = LimitedMessageCache(max_size=math.floor(10000 / len(message_logging_servers)))
     print(f"Max cached messages per server ({len(message_logging_servers)}) is {message_cache.max_size}")
 
     print("<<<------------------------------------------------------------------------------>>>")
@@ -209,6 +209,7 @@ async def on_message(message: disnake.Message):
     # Evan is cute
     if message.author.id == 1156417904061993012 and random.random() < 0.02:
         try:
+            print(f"socute...")
             await message.add_reaction(emoji_cache["letter_C"])
             await message.add_reaction(emoji_cache["letter_U"])
             await message.add_reaction(emoji_cache["letter_T"])
