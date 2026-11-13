@@ -190,7 +190,14 @@ async def on_message(message: disnake.Message):
                 await message.channel.send(":3")
             except Exception as e:
                 print(f"Failed to nya~~~~ :( am sad: {e}")
-    
+
+    # beep
+    if message.content and "beep" in message_content(message):
+        if random.random() < 0.05:
+            try:
+                await message.channel.send("beep", delete_after=1.0)
+            except Exception as e:
+                print(f"Failed to beep... am sad: {e}")
 
     # Emoji reaction after mention
     if bot.user.mentioned_in(message):
